@@ -5,7 +5,7 @@ import { SignIn } from './pages/auth/sign-in';
 import { SignUp } from './pages/auth/sign-up';
 import { NotFound } from './pages/404';
 import { Error } from './pages/error';
-import { AccommodationList } from './pages/app/accommodations/accommodation';
+import { AccommodationList } from './pages/app/accommodations/accommodation-list';
 
 export const router = createBrowserRouter([
     {

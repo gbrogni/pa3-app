@@ -17,11 +17,11 @@ export const AccommodationList: React.FC = () => {
   }, []);
 
   if (!accommodations) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
       {accommodations.map((accommodation) => (
         <AccommodationCard key={accommodation.slug} accommodation={accommodation} />
       ))}
