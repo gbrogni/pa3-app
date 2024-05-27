@@ -12,10 +12,10 @@ import { z } from 'zod';
 const signUpForm = z.object({
     paymentMethod: z.nativeEnum(PaymentMethod),
     cardNumber: z.number(),
-    cardName: z.string(),
+    cardName: z.string().min(1, { message: "Name must be a text" }),
     expiryMonth: z.string(),
     expiryYear: z.string(),
-    cvc: z.number().min(3).max(3),
+    cvc: z.string().length(3, { message: "CVC must be exactly 3 digits" }),
 });
 
 type SignUpForm = z.infer<typeof signUpForm>;
@@ -102,7 +102,7 @@ export function Payments({ setPaymentData, isPaymentSuccessful }: { setPaymentDa
                     </RadioGroup>
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input {...register('cardName', { required: true })} id="name" placeholder="First Last" />
+                        <Input {...register('cardName', { required: true })} id="name" type='text' placeholder="" />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="number">Card number</Label>

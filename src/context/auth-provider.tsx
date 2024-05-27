@@ -63,8 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode; }> = ({ childre
             Cookies.set('access_token', token);
             setAuthState({ isAuthenticated: true, token });
         } catch (error) {
-            console.error('Failed to authenticate:', error);
-            // Consider showing an error message to the user here
+            throw new Error('Failed to authenticate');
         }
     };
 

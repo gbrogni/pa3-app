@@ -8,14 +8,14 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/react-query';
 import { AuthProvider } from './context/auth-provider';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { store } from './reducers/store';
 
 export function App() {
   return (
     <Provider store={store}>
       <HelmetProvider>
         <ThemeProvider defaultTheme="dark" storageKey="pa3-theme">
-          <Helmet titleTemplate="pa3" />
+          <Helmet titleTemplate="Pousada quinta do Ypuã" />
 
           <Toaster richColors />
 

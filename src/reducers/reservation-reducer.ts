@@ -1,4 +1,4 @@
-import { SET_RESERVATION, CartActionTypes } from '@/actions/actions';
+import { SET_RESERVATION, CartActionTypes } from '@/reducers/actions';
 import { Reservation } from '@/interfaces';
 
 interface ReservationState {

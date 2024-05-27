@@ -1,4 +1,4 @@
-import { SET_ACCOMMODATIONS, CartActionTypes } from '@/actions/actions';
+import { SET_ACCOMMODATIONS, CartActionTypes } from '@/reducers/actions';
 import { Accommodation } from '@/interfaces';
 
 interface AccommodationState {

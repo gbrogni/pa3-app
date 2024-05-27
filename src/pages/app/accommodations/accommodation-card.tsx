@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Accommodation, Reservation } from '@/interfaces';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -15,8 +15,11 @@ interface AccommodationCardProps {
     userId: string;
 }
 
+const SIGN_IN_PATH = '/auth/sign-in';
+const CART_PATH = '/cart';
+const DEFAULT_IMAGE_URL = 'default_image_url';
+
 export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, onAddToCart, userId }) => {
-    const defaultImageUrl = 'default_image_url';
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
     const [count, setCount] = useState(0);
@@ -39,7 +42,7 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
 
     const handleAddToCart = () => {
         if (!isAuthenticated) {
-            navigate('/auth/sign-in');
+            navigate(SIGN_IN_PATH);
             return;
         }
     
@@ -61,8 +64,22 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
         };
     
         onAddToCart(reservation);
-        navigate('/cart');
+        navigate(CART_PATH);
     };
+
+    const carouselImages = useMemo(() => {
+        return accommodation.images && accommodation.images.length > 0 ? (
+            accommodation.images.map((image, index) => (
+                <CarouselItem key={index}>
+                    <img className="h-full w-full object-cover" src={image.url} alt={`${accommodation.name} ${index}`} loading="lazy" />
+                </CarouselItem>
+            ))
+        ) : (
+            <CarouselItem>
+                <img className="h-full w-full object-cover" src={DEFAULT_IMAGE_URL} alt={accommodation.name} loading="lazy" />
+            </CarouselItem>
+        );
+    }, [accommodation.images, accommodation.name]);
 
     return (
         <Card className={`flex flex-col shadow-md overflow-hidden border rounded`}>
@@ -73,17 +90,7 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
                 <div className="flex-shrink-0 relative">
                     <Carousel setApi={setApi}>
                         <CarouselContent>
-                            {accommodation.images && accommodation.images.length > 0 ? (
-                                accommodation.images.map((image, index) => (
-                                    <CarouselItem key={index}>
-                                        <img className="h-full w-full object-cover" src={image.url} alt={`${accommodation.name} ${index}`} loading="lazy" />
-                                    </CarouselItem>
-                                ))
-                            ) : (
-                                <CarouselItem>
-                                    <img className="h-full w-full object-cover" src={defaultImageUrl} alt={accommodation.name} loading="lazy" />
-                                </CarouselItem>
-                            )}
+                            {carouselImages}
                         </CarouselContent>
                         <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2" />
                         <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2" />

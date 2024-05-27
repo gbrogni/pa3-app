@@ -43,7 +43,6 @@ const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
                     </span>
                 </Button>
 
-                {/* hides browsers password toggles */}
                 <style>{`
 					.hide-password-toggle::-ms-reveal,
 					.hide-password-toggle::-ms-clear {

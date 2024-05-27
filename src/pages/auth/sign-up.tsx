@@ -10,13 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PasswordInput } from '@/components/password-input';
-import { useState } from 'react';
 
 const signUpForm = z.object({
     name: z.string(),
     email: z.string().email(),
-    password: z.string().min(6),
-    confirmPassword: z.string().min(6),
+    password: z.string(),
+    confirmPassword: z.string(),
     cpf: z.string().length(11),
     phone: z.string().length(11),
 });
@@ -26,14 +25,15 @@ type SignUpForm = z.infer<typeof signUpForm>;
 export function SignUp() {
     const navigate = useNavigate();
 
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-
     const {
         register,
         handleSubmit,
         formState: { isSubmitting },
+        watch
     } = useForm<SignUpForm>();
+
+    const password = watch('password');
+    const confirmPassword = watch('confirmPassword');
 
     const { mutateAsync: registerUserFn } = useMutation({
         mutationFn: createUser,
@@ -45,13 +45,11 @@ export function SignUp() {
             return;
         }
 
-        console.log(data);
-
         try {
             await registerUserFn({
                 name: data.name,
                 email: data.email,
-                password: password,
+                password: data.password,
                 phone: data.phone,
                 cpf: data.cpf,
             });
@@ -59,7 +57,7 @@ export function SignUp() {
             toast.success('Usuário cadastrado com sucesso!', {
                 action: {
                     label: 'Login',
-                    onClick: () => navigate(`/sign-in?email=${data.email}&password=${data.password}`),
+                    onClick: () => navigate(`/auth/sign-in?email=${data.email}&password=${data.password}`),
                 },
             });
         } catch (error) {
@@ -124,7 +122,7 @@ export function SignUp() {
                             <PasswordInput
                                 id="password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                {...register('password')}
                                 autoComplete="new-password"
                             />
                         </div>
@@ -134,7 +132,7 @@ export function SignUp() {
                             <PasswordInput
                                 id="confirmPassword"
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                {...register('confirmPassword')}
                                 autoComplete="new-password"
                             />
                         </div>

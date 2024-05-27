@@ -3,7 +3,7 @@ import { Reservation } from '@/interfaces';
 import { useEffect, useContext } from 'react';
 import { AuthContext } from '@/context/auth-provider';
 import { useDispatch, useSelector } from 'react-redux';
-import { CartActionTypes, SET_RESERVATION, setAccommodations } from '@/actions/actions';
+import { CartActionTypes, SET_RESERVATION, setAccommodations } from '@/reducers/actions';
 import { AccommodationCard } from './accommodation-card';
 import { Dispatch } from 'redux';
 import { RootState } from '@/reducers/root-reducer';
