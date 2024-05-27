@@ -5,9 +5,9 @@ export enum ReservationStatus {
 }
 
 export interface Reservation {
-    checkIn: Date;
-    checkOut: Date;
+    checkIn: string;
+    checkOut: string;
     userId: string;
     accomodationId: string;
-    status: ReservationStatus;
+    status?: ReservationStatus;
 }

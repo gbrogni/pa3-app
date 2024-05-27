@@ -6,6 +6,8 @@ import { SignUp } from './pages/auth/sign-up';
 import { NotFound } from './pages/404';
 import { Error } from './pages/error';
 import { AccommodationList } from './pages/app/accommodations/accommodation-list';
+import { PrivateRoute } from './pages/auth/private-route';
+import { Cart } from './pages/app/cart/cart';
 
 export const router = createBrowserRouter([
     {
@@ -15,24 +17,40 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: '/',
-                element: <AccommodationList />,
+                element: (
+                    <PrivateRoute>
+                        <AccommodationList />
+                    </PrivateRoute>
+                ),
             },
-            // {
-            //     path: '/orders',
-            //     element: <Orders />,
-            // },
+            {
+                path: '/accommodations',
+                element: (
+                    <PrivateRoute restricted={false}>
+                        <AccommodationList />
+                    </PrivateRoute>
+                ),
+            },
+            {
+                path: '/cart',
+                element: (
+                    <PrivateRoute restricted={true}>
+                        <Cart />
+                    </PrivateRoute>
+                ),
+            }
         ],
     },
     {
-        path: '/',
+        path: '/auth',
         element: <AuthLayout />,
         children: [
             {
-                path: '/sign-in',
+                path: 'sign-in',
                 element: <SignIn />,
             },
             {
-                path: '/sign-up',
+                path: 'sign-up',
                 element: <SignUp />,
             },
         ],

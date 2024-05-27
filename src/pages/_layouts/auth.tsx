@@ -1,7 +1,8 @@
 import { Hotel } from 'lucide-react';
-import { Outlet } from 'react-router-dom';
+import {  Outlet } from 'react-router-dom';
 
 export function AuthLayout() {
+
     return (
         <div className="grid min-h-screen grid-cols-2 antialiased">
             <div className='h-full border-right border-foreground/5 bg-muted p-10 text-muted-foreground flex flex-col justify-between'>

@@ -4,9 +4,17 @@ import { Outlet, useNavigate } from 'react-router-dom'
 
 import { Header } from '@/components/header'
 import { api } from '@/lib/axios'
+import { useAuth } from '@/context/auth-provider'
 
 export function AppLayout() {
     const navigate = useNavigate()
+    const { isAuthenticated } = useAuth()
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/auth/sign-in', { replace: true })
+        }
+    }, [navigate, isAuthenticated])
 
     useEffect(() => {
         const interceptorId = api.interceptors.response.use(
@@ -17,7 +25,7 @@ export function AppLayout() {
                     const code = error.response?.data.code
 
                     if (status === 401 && code === 'UNAUTHORIZED') {
-                        navigate('/sign-in', { replace: true })
+                        navigate('/auth/sign-in', { replace: true })
                     }
                 }
             },

@@ -6,8 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { signIn } from '@/api/sign-in';
-import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '@/context/auth-provider';
 
 const signInForm = z.object({
     email: z.string().email(),
@@ -18,6 +17,7 @@ type SignInForm = z.infer<typeof signInForm>;
 
 export function SignIn() {
     const navigate = useNavigate();
+    const { signIn } = useAuth(); 
     const [searchParams] = useSearchParams();
     const {
         register,
@@ -30,18 +30,13 @@ export function SignIn() {
         },
     });
 
-    const { mutateAsync: authenticate } = useMutation({
-        mutationFn: signIn,
-    });
-
     async function handleSignIn(data: SignInForm) {
         try {
-            const accessToken = await authenticate({ email: data.email, password: data.password });
-            localStorage.setItem('access_token', accessToken);
+            await signIn(data.email, data.password);
 
             toast.success('Autenticado corretamente');
 
-            navigate('/home');
+            navigate('/accommodations');
         } catch (error) {
             toast.error('Credenciais inválidas.');
         }
@@ -53,7 +48,7 @@ export function SignIn() {
 
             <div className="p-8">
                 <Button variant="ghost" asChild className="absolute right-8 top-8">
-                    <Link to="/sign-up">Novo usuário</Link>
+                    <Link to="/auth/sign-up">Novo usuário</Link>
                 </Button>
 
                 <div className="flex w-[350px] flex-col justify-center gap-6">

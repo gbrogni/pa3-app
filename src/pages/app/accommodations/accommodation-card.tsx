@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Accommodation } from '@/interfaces';
+import { Accommodation, Reservation } from '@/interfaces';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Import Card components
-import { differenceInDays, subDays } from 'date-fns';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { DateRange } from 'react-day-picker';
-import { DateRangePicker } from './ui/date-range-picker';
 import { ShoppingCart } from 'lucide-react';
+import { toast } from 'sonner';
+import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/auth-provider';
 
 interface AccommodationCardProps {
     accommodation: Accommodation;
+    onAddToCart: (reservation: Reservation) => void;
+    userId: string;
 }
 
-export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation }) => {
+export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, onAddToCart, userId }) => {
     const defaultImageUrl = 'default_image_url';
     const [api, setApi] = useState<CarouselApi>();
     const [current, setCurrent] = useState(0);
     const [count, setCount] = useState(0);
-    const [dateRange, setDateRange] = useState<DateRange | undefined>({
-        from: subDays(new Date(), 7),
-        to: new Date(),
-    });
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!api) {
@@ -33,6 +36,33 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
             setCurrent(api.selectedScrollSnap() + 1);
         });
     }, [api]);
+
+    const handleAddToCart = () => {
+        if (!isAuthenticated) {
+            navigate('/auth/sign-in');
+            return;
+        }
+    
+        if (!dateRange || !dateRange.from || !dateRange.to) {
+            toast.warning('Por favor, selecione um intervalo de datas.');
+            return;
+        }
+    
+        if (dateRange.to < dateRange.from) {
+            toast.warning('A data final não pode ser menor que a data inicial.');
+            return;
+        }
+    
+        const reservation: Reservation = {
+            checkIn: dateRange.from.toISOString(),
+            checkOut: dateRange.to.toISOString(),
+            userId: userId,
+            accomodationId: accommodation.id,
+        };
+    
+        onAddToCart(reservation);
+        navigate('/cart');
+    };
 
     return (
         <Card className={`flex flex-col shadow-md overflow-hidden border rounded`}>
@@ -66,17 +96,17 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
                     <h2 className="font-semibold text-xl mb-2">{accommodation.name}</h2>
                     <p className="text-gray-600">{accommodation.description}</p>
                     <div className="mt-4">
-                    <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold">R$ {accommodation.price}/noite</span>
+                        <div className="flex justify-between items-center">
+                            <span className="text-lg font-semibold">R$ {accommodation.price}/noite</span>
+                        </div>
+                        <div className="mt-2 flex justify-between items-center">
+                            <DateRangePicker date={dateRange} onDateChange={setDateRange} />
+                            <button className="ml-4 flex items-center" onClick={handleAddToCart}>
+                                <ShoppingCart className="mr-2" />
+                                Fazer reserva
+                            </button>
+                        </div>
                     </div>
-                    <div className="mt-2 flex justify-between items-center">
-                        <DateRangePicker date={dateRange} onDateChange={setDateRange} />
-                        <button className="ml-4 flex items-center">
-                            <ShoppingCart className="mr-2" />
-                            Adicionar ao carrinho
-                        </button>
-                    </div>
-                </div>
                 </div>
             </CardContent>
         </Card>

@@ -13,6 +13,7 @@ export interface Image {
 }
 
 export interface Accommodation {
+    id: string;
     name: string;
     description: string;
     slug: string;

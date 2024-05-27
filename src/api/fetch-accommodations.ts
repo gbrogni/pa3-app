@@ -14,8 +14,7 @@ export interface GetAccommodationsResponse {
     };
 };
 
-export async function getAccommodations(query: GetAccommodationsQuery): Promise<GetAccommodationsResponse> {
-    const token = localStorage.getItem('access_token');
+export async function getAccommodations(query: GetAccommodationsQuery, token: string): Promise<GetAccommodationsResponse> {
     const response = await api.get<GetAccommodationsResponse>('/accommodations', {
         headers: {
             'Authorization': `Bearer ${token}`

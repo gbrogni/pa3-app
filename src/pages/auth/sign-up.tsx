@@ -16,6 +16,9 @@ const signUpForm = z.object({
     name: z.string(),
     email: z.string().email(),
     password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+    cpf: z.string().length(11),
+    phone: z.string().length(11),
 });
 
 type SignUpForm = z.infer<typeof signUpForm>;
@@ -24,6 +27,7 @@ export function SignUp() {
     const navigate = useNavigate();
 
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
     const {
         register,
@@ -36,11 +40,20 @@ export function SignUp() {
     });
 
     async function handleSignUp(data: SignUpForm) {
+        if (data.password !== data.confirmPassword) {
+            toast.error('As senhas não correspondem.');
+            return;
+        }
+
+        console.log(data);
+
         try {
             await registerUserFn({
                 name: data.name,
                 email: data.email,
-                password: data.password,
+                password: password,
+                phone: data.phone,
+                cpf: data.cpf,
             });
 
             toast.success('Usuário cadastrado com sucesso!', {
@@ -60,7 +73,7 @@ export function SignUp() {
 
             <div className="p-8">
                 <Button variant="ghost" asChild className="absolute right-8 top-8">
-                    <Link to="/sign-in">Fazer login</Link>
+                    <Link to="/auth/sign-in">Fazer login</Link>
                 </Button>
 
                 <div className="flex w-[350px] flex-col justify-center gap-6">
@@ -75,7 +88,7 @@ export function SignUp() {
 
                     <form className="space-y-4" onSubmit={handleSubmit(handleSignUp)}>
                         <div className="space-y-2">
-                            <Label htmlFor="name">Nome do usuário</Label>
+                            <Label htmlFor="name">Nome</Label>
                             <Input
                                 id="name"
                                 type="text"
@@ -84,16 +97,44 @@ export function SignUp() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="email">Seu e-mail</Label>
+                            <Label htmlFor="cpf">CPF</Label>
+                            <Input
+                                id="cpf"
+                                type="text"
+                                {...register('cpf')}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="phone">Telefone</Label>
+                            <Input
+                                id="phone"
+                                type="text"
+                                {...register('phone')}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="email">E-mail</Label>
                             <Input id="email" type="email" {...register('email')} />
                         </div>
 
                         <div>
-                            <Label htmlFor="password">New Password</Label>
+                            <Label htmlFor="password">Senha</Label>
                             <PasswordInput
                                 id="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="new-password"
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+                            <PasswordInput
+                                id="confirmPassword"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 autoComplete="new-password"
                             />
                         </div>
