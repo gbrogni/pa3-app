@@ -1,8 +1,8 @@
 import { Home, Hotel, ShoppingCart } from 'lucide-react';
-
 import { NavLink } from './nav-link';
 import { Separator } from './ui/separator';
 import { ThemeToggle } from './theme/theme-toggle';
+import { AccountMenu } from './account-menu';
 
 export function Header() {
     return (
@@ -13,7 +13,7 @@ export function Header() {
                 <Separator orientation="vertical" className="h-6" />
 
                 <nav className="flex items-center space-x-4 lg:space-x-6">
-                    <NavLink to="/">
+                    <NavLink to="/accommodations">
                         <Home className="h-4 w-4" />
                         Início
                     </NavLink>
@@ -24,6 +24,7 @@ export function Header() {
                         <ShoppingCart className="h-4 w-4" />
                         Carrinho
                     </NavLink>
+                    <AccountMenu />
                 </div>
             </div>
         </div>

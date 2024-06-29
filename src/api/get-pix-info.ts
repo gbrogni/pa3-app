@@ -1,24 +1,29 @@
 import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
 
-interface MakePaymentBody {
+interface GetPixInfoBody {
     reservationId: string;
     value: number;
 }
 
-export async function makePayment({
+interface PixInfo {
+    qrCodeImage: string;
+    brCode: string;
+}
+
+export async function getPixInfo({
     reservationId,
-    value
-}: MakePaymentBody) {
+    value,
+}: GetPixInfoBody) {
     const token = Cookies.get('access_token');
-    const response = await api.post(`/reservations/make-payment`, {
+    const response = await api.post(`/reservations/pix`, {
         reservationId,
-        value
+        value,
     }, {
         headers: {
             Authorization: `Bearer ${token}`,
-        },
+        }
     });
 
-    return response;
+    return response.data.data as PixInfo;
 }

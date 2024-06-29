@@ -1,8 +1,18 @@
+import { isAuthenticated } from '@/context/auth';
 import { Hotel } from 'lucide-react';
-import {  Outlet } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 export function AuthLayout() {
+    const navigate = useNavigate();
 
+    useEffect(() => {
+        const isAuth = isAuthenticated();
+        if (!isAuth) {
+            navigate('/auth/sign-in');
+        }
+    }, [navigate]);
+    
     return (
         <div className="grid min-h-screen grid-cols-2 antialiased">
             <div className='h-full border-right border-foreground/5 bg-muted p-10 text-muted-foreground flex flex-col justify-between'>
@@ -11,7 +21,7 @@ export function AuthLayout() {
                     <span className='font-semibold'>Pousada quinta do Ypuã</span>
                 </div>
                 <footer className='text-sm'>
-                Pousada quinta do Ypuã &copy; - {new Date().getFullYear()}
+                    Pousada quinta do Ypuã &copy; - {new Date().getFullYear()}
                 </footer>
             </div>
 
@@ -19,5 +29,5 @@ export function AuthLayout() {
                 <Outlet />
             </div>
         </div>
-    )
+    );
 }

@@ -1,40 +1,22 @@
-import { isAxiosError } from 'axios'
-import { useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 
-import { Header } from '@/components/header'
-import { api } from '@/lib/axios'
-import { useAuth } from '@/context/auth-provider'
+import { Header } from '@/components/header';
+import { isAuthenticated } from '@/context/auth';
 
 export function AppLayout() {
-    const navigate = useNavigate()
-    const { isAuthenticated } = useAuth()
+    const navigate = useNavigate();
+    const isAuth = isAuthenticated();
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/auth/sign-in', { replace: true })
+        if (!isAuth) {
+            navigate('/auth/sign-in');
         }
-    }, [navigate, isAuthenticated])
+    }, [isAuth, navigate]);
 
-    useEffect(() => {
-        const interceptorId = api.interceptors.response.use(
-            (response) => response,
-            (error) => {
-                if (isAxiosError(error)) {
-                    const status = error.response?.status
-                    const code = error.response?.data.code
-
-                    if (status === 401 && code === 'UNAUTHORIZED') {
-                        navigate('/auth/sign-in', { replace: true })
-                    }
-                }
-            },
-        )
-
-        return () => {
-            api.interceptors.response.eject(interceptorId)
-        }
-    }, [navigate])
+    if (!isAuth) {
+        return null;
+    }
 
     return (
         <div className="flex min-h-screen flex-col antialiased">
@@ -43,5 +25,5 @@ export function AppLayout() {
                 <Outlet />
             </div>
         </div>
-    )
+    );
 }

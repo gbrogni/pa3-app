@@ -5,44 +5,46 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/reducers/root-reducer';
 import { getUserInfo } from '@/api/get-user-info';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { Payments } from './payment';
+import { Button } from '@/components/ui/button';
+import { Pix } from './pix';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { createReservation } from '@/api/create-reservation';
-import { makePayment } from '@/api/make-payment';
-import { PaymentMethod } from '@/interfaces';
-import { toast } from 'sonner';
-
-interface PaymentData {
-    cardNumber: string;
-    cardName: string;
-    expiryDate: Date;
-    cvc: string;
-    paymentMethod: PaymentMethod;
-}
+import { useNavigate } from 'react-router-dom';
 
 export function Cart() {
-    const reservation = useSelector((state: RootState) => state.reservation);
+    const reservation = useSelector((state: RootState) => state.reservation.reservation);
     const accommodations = useSelector((state: RootState) => state.accommodations);
-    const [paymentData, setPaymentData] = useState<PaymentData | null>(null);
-    const [isPaymentSuccessful, setIsPaymentSuccessful] = useState(false);
+    const accommodation = accommodations.accommodations?.find(accommodation => accommodation.id === reservation?.accomodationId);
+    const { register, setValue } = useForm();
+    const [reservationId, setReservationId] = useState('');
+    const [open, setOpen] = useState(false);
+    const navigate = useNavigate();
+
     const { data: profile, isLoading: isLoadingProfile } = useQuery({
         queryKey: ['profile'],
         queryFn: getUserInfo,
         staleTime: Infinity,
     });
 
-    const accommodation = accommodations.accommodations?.find(accommodation => accommodation.id === reservation.reservation?.accomodationId);
+    const handleContinueClick = async () => {
+        if (reservation) {
+            try {
+                const reservationData = {
+                    checkIn: reservation.checkIn,
+                    checkOut: reservation.checkOut,
+                    accommodationId: reservation.accomodationId,
+                };
 
-    const { register, setValue } = useForm();
+                const response = await createReservation(reservationData);
 
-    const { mutateAsync: createReservationFn } = useMutation({
-        mutationFn: createReservation,
-    });
-
-    const { mutateAsync: makePaymentFn } = useMutation({
-        mutationFn: makePayment,
-    });
+                setReservationId(response.reservationId);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
 
     useEffect(() => {
         if (profile && !isLoadingProfile) {
@@ -53,44 +55,12 @@ export function Cart() {
         }
     }, [profile, isLoadingProfile, setValue]);
 
-    useEffect(() => {
-        const createReservationAsync = async () => {
-            if (paymentData && accommodation && reservation.reservation) {
-                try {
-                    const { reservationId } = await createReservationFn({
-                        checkIn: new Date(reservation.reservation.checkIn),
-                        checkOut: new Date(reservation.reservation.checkOut),
-                        accommodationId: accommodation.id,
-                    });
 
-                    const paymentResponse = await makePaymentFn({
-                        reservationId,
-                        amount: diffDays * accommodation.price,
-                        cardNumber: paymentData.cardNumber,
-                        cardName: paymentData.cardName,
-                        expiryDate: paymentData.expiryDate,
-                        paymentMethod: paymentData.paymentMethod,
-                        cvc: paymentData.cvc,
-                    });
-
-                    if (paymentResponse.status === 204) {
-                        setIsPaymentSuccessful(true);
-                        toast.success('Reserva realizada com sucesso!');
-                    }
-                } catch (error) {
-                    console.error(error);
-                    toast.error('Ocorreu um erro ao fazer a reserva.');
-                }
-            }
-        };
-
-        createReservationAsync();
-    }, [paymentData, profile, reservation.reservation, createReservationFn, accommodation]);
 
     let diffDays = 0;
-    if (reservation.reservation?.checkIn && reservation.reservation?.checkOut) {
-        const checkInDate = new Date(reservation.reservation.checkIn);
-        const checkOutDate = new Date(reservation.reservation.checkOut);
+    if (reservation?.checkIn && reservation?.checkOut) {
+        const checkInDate = new Date(reservation.checkIn);
+        const checkOutDate = new Date(reservation.checkOut);
         const oneDay = 24 * 60 * 60 * 1000;
         diffDays = Math.round(Math.abs((+checkInDate - +checkOutDate) / oneDay));
     }
@@ -113,7 +83,7 @@ export function Cart() {
                                         <span className="text-lg font-semibold">R$ {accommodation?.price}/noite</span>
                                     </div>
                                     <div className="mt-2 flex justify-between items-center">
-                                        <span>Período: {reservation.reservation && new Date(reservation.reservation.checkIn).toLocaleDateString()} - {reservation.reservation && new Date(reservation.reservation.checkOut).toLocaleDateString()}</span>
+                                        <span>Período: {reservation && new Date(reservation.checkIn).toLocaleDateString()} - {reservation && new Date(reservation.checkOut).toLocaleDateString()}</span>
                                     </div>
                                     <div className="mt-2 flex justify-between items-center">
                                         <span>Total: R$ {totalPrice}</span>
@@ -146,9 +116,17 @@ export function Cart() {
                     </form>
                 </div>
             </div>
-            <div className="w-full">
-                <Payments setPaymentData={setPaymentData} isPaymentSuccessful={isPaymentSuccessful} />
-            </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger>
+                    <Button type='button' onClick={handleContinueClick} className="w-full">Continue</Button>
+                </DialogTrigger>
+                <DialogContent>
+                    {reservationId && <Pix reservationId={reservationId} value={totalPrice} onClose={() => {
+                        setOpen(false);
+                        navigate('/accommodations');
+                    }} />}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

@@ -1,7 +1,7 @@
-import { Link, useRouteError } from 'react-router-dom'
+import { Link, useRouteError } from 'react-router-dom';
 
 export function Error() {
-    const error = useRouteError() as Error
+    const error = useRouteError() as Error;
 
     return (
         <div className="flex h-screen flex-col items-center justify-center gap-2">
@@ -17,5 +17,5 @@ export function Error() {
                 </Link>
             </p>
         </div>
-    )
-}''
+    );
+}

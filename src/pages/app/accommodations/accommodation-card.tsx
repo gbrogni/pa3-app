@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Accommodation, Reservation } from '@/interfaces';
+import { Accommodation, Reservation, ReservationStatus } from '@/interfaces';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { DateRange } from 'react-day-picker';
@@ -7,7 +7,7 @@ import { ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/auth-provider';
+import { isAuthenticated } from '@/context/auth';
 
 interface AccommodationCardProps {
     accommodation: Accommodation;
@@ -24,8 +24,14 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
     const [current, setCurrent] = useState(0);
     const [count, setCount] = useState(0);
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
-    const { isAuthenticated } = useAuth();
     const navigate = useNavigate();
+
+    const disabledDates = accommodation.reservations
+        .filter(reservation => reservation.status === ReservationStatus.CONFIRMED)
+        .map(reservation => ({
+            from: new Date(reservation.checkIn),
+            to: new Date(reservation.checkOut),
+        }));
 
     useEffect(() => {
         if (!api) {
@@ -41,28 +47,32 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
     }, [api]);
 
     const handleAddToCart = () => {
-        if (!isAuthenticated) {
+        if (!isAuthenticated()) {
             navigate(SIGN_IN_PATH);
             return;
         }
-    
+
         if (!dateRange || !dateRange.from || !dateRange.to) {
-            toast.warning('Por favor, selecione um intervalo de datas.');
+            toast.warning('Por favor, selecione um intervalo de datas.', {
+                duration: 5000
+            });
             return;
         }
-    
+
         if (dateRange.to < dateRange.from) {
-            toast.warning('A data final não pode ser menor que a data inicial.');
+            toast.warning('A data final não pode ser menor que a data inicial.', {
+                duration: 5000
+            });
             return;
         }
-    
+
         const reservation: Reservation = {
             checkIn: dateRange.from.toISOString(),
             checkOut: dateRange.to.toISOString(),
             userId: userId,
             accomodationId: accommodation.id,
         };
-    
+
         onAddToCart(reservation);
         navigate(CART_PATH);
     };
@@ -107,7 +117,11 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
                             <span className="text-lg font-semibold">R$ {accommodation.price}/noite</span>
                         </div>
                         <div className="mt-2 flex justify-between items-center">
-                            <DateRangePicker date={dateRange} onDateChange={setDateRange} />
+                            <DateRangePicker
+                                date={dateRange}
+                                onDateChange={setDateRange}
+                                disabledDates={disabledDates}
+                            />
                             <button className="ml-4 flex items-center" onClick={handleAddToCart}>
                                 <ShoppingCart className="mr-2" />
                                 Fazer reserva

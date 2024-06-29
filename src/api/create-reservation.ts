@@ -2,8 +2,8 @@ import { api } from '@/lib/axios';
 import Cookies from 'js-cookie';
 
 interface CreateReservationBody {
-    checkIn: Date;
-    checkOut: Date;
+    checkIn: string;
+    checkOut: string;
     accommodationId: string;
 }
 

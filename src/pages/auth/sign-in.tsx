@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/context/auth-provider';
+import { signIn } from '@/context/auth';
 
 const signInForm = z.object({
     email: z.string().email(),
@@ -17,7 +17,6 @@ type SignInForm = z.infer<typeof signInForm>;
 
 export function SignIn() {
     const navigate = useNavigate();
-    const { signIn } = useAuth(); 
     const [searchParams] = useSearchParams();
     const {
         register,

@@ -15,7 +15,6 @@ export async function createUser({
     phone,
     password,
 }: CreateUserBody) {
-    console.log(name, email, cpf, phone, password)
     await api.post('/accounts', {
         name,
         email,

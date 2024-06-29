@@ -1,28 +1,30 @@
-'use client'
+'use client';
 
-import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import * as React from 'react'
-import { DateRange } from 'react-day-picker'
+import { format } from 'date-fns';
+import { Calendar as CalendarIcon } from 'lucide-react';
+import * as React from 'react';
+import { DateRange } from 'react-day-picker';
 
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
+} from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
 
 interface DateRangePickerProps extends React.ComponentProps<'div'> {
-    date: DateRange | undefined
-    onDateChange: (date: DateRange | undefined) => void
+    date: DateRange | undefined;
+    onDateChange: (date: DateRange | undefined) => void;
+    disabledDates?: DateRange[];
 }
 
 export function DateRangePicker({
     date,
     onDateChange,
     className,
+    disabledDates,
 }: DateRangePickerProps) {
     return (
         <div className={cn('grid gap-2', className)}>
@@ -59,9 +61,10 @@ export function DateRangePicker({
                         selected={date}
                         onSelect={onDateChange}
                         numberOfMonths={2}
+                        disabled={disabledDates}
                     />
                 </PopoverContent>
             </Popover>
         </div>
-    )
+    );
 }
