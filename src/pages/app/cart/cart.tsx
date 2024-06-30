@@ -5,7 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/reducers/root-reducer';
 import { getUserInfo } from '@/api/get-user-info';
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pix } from './pix';
@@ -21,12 +20,6 @@ export function Cart() {
     const [reservationId, setReservationId] = useState('');
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-
-    const { data: profile, isLoading: isLoadingProfile } = useQuery({
-        queryKey: ['profile'],
-        queryFn: getUserInfo,
-        staleTime: Infinity,
-    });
 
     const handleContinueClick = async () => {
         if (reservation) {
@@ -47,13 +40,19 @@ export function Cart() {
     };
 
     useEffect(() => {
-        if (profile && !isLoadingProfile) {
-            setValue('name', profile.name);
-            setValue('email', profile.email);
-            setValue('phone', profile.phone);
-            setValue('cpf', profile.cpf);
-        }
-    }, [profile, isLoadingProfile, setValue]);
+        const fetchData = async () => {
+            const profile = await getUserInfo();
+            if (profile) {
+                setValue('name', profile.name);
+                setValue('email', profile.email);
+                setValue('phone', profile.phone);
+                setValue('cpf', profile.cpf);
+            }
+            console.log(profile);
+        };
+
+        fetchData();
+    }, [setValue]);
 
 
 
