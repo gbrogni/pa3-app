@@ -1,19 +1,30 @@
-import { SET_RESERVATION, CartActionTypes } from '@/reducers/actions';
+import { ADD_TO_CART, CartActionTypes, REMOVE_FROM_CART, RESET_RESERVATIONS, UPDATE_RESERVATION } from '@/reducers/actions';
 import { Reservation } from '@/interfaces';
 
 interface ReservationState {
-    reservation: Reservation | null;
+  reservations: Reservation[];
 }
 
 const initialState: ReservationState = {
-    reservation: null,
+  reservations: [],
 };
 
 export const reservationReducer = (state = initialState, action: CartActionTypes): ReservationState => {
-    switch (action.type) {
-        case SET_RESERVATION:
-            return { ...state, reservation: action.payload };
-        default:
-            return state;
-    }
+  switch (action.type) {
+    case ADD_TO_CART:
+      return { ...state, reservations: [...state.reservations, action.payload] };
+    case REMOVE_FROM_CART:
+      return { ...state, reservations: state.reservations.filter(reservation => reservation.accomodationId !== action.payload) };
+    case UPDATE_RESERVATION:
+      return {
+        ...state,
+        reservations: state.reservations.map(reservation =>
+          reservation.accomodationId === action.payload.accomodationId ? action.payload : reservation
+        ),
+      };
+    case RESET_RESERVATIONS:
+      return initialState;
+    default:
+      return state;
+  }
 };

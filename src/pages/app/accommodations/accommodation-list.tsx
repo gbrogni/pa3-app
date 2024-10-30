@@ -2,7 +2,7 @@ import { GetAccommodationsQuery, getAccommodations } from '@/api/fetch-accommoda
 import { Reservation } from '@/interfaces';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { CartActionTypes, SET_RESERVATION, setAccommodations } from '@/reducers/actions';
+import { CartActionTypes, ADD_TO_CART, setAccommodations } from '@/reducers/actions';
 import { AccommodationCard } from './accommodation-card';
 import { Dispatch } from 'redux';
 import { RootState } from '@/reducers/root-reducer';
@@ -15,21 +15,21 @@ export function AccommodationList() {
   const token = Cookies.get('access_token');
 
   const handleAddToCart = (reservation: Reservation) => {
-    dispatch({ type: SET_RESERVATION, payload: reservation });
+    dispatch({ type: ADD_TO_CART, payload: reservation });
   };
 
   useEffect(() => {
     try {
       const isAuth = isAuthenticated();
       if (!isAuth) {
-          redirect('/auth/sign-in');
+        redirect('/auth/sign-in');
       }
       const fetchAccommodations = async () => {
         const query: GetAccommodationsQuery = { pageIndex: 1 };
         const response = await getAccommodations(query, token as string);
         dispatch(setAccommodations(response.accommodations));
       };
-  
+
       fetchAccommodations();
     } catch {
       console.error('Failed to fetch accommodations');

@@ -49,7 +49,7 @@ export function DateRangePicker({
                                 format(date.from, 'LLL dd, y')
                             )
                         ) : (
-                            <span>Pick a date</span>
+                            <span>Selecione uma data</span>
                         )}
                     </Button>
                 </PopoverTrigger>

@@ -16,7 +16,6 @@ interface AccommodationCardProps {
 }
 
 const SIGN_IN_PATH = '/auth/sign-in';
-const CART_PATH = '/cart';
 const DEFAULT_IMAGE_URL = 'default_image_url';
 
 export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodation, onAddToCart, userId }) => {
@@ -73,8 +72,9 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
             accomodationId: accommodation.id,
         };
 
+        toast.success('Reserva adicionada ao carrinho!');
         onAddToCart(reservation);
-        navigate(CART_PATH);
+        setDateRange(undefined);
     };
 
     const carouselImages = useMemo(() => {
@@ -124,7 +124,7 @@ export const AccommodationCard: React.FC<AccommodationCardProps> = ({ accommodat
                             />
                             <button className="ml-4 flex items-center" onClick={handleAddToCart}>
                                 <ShoppingCart className="mr-2" />
-                                Fazer reserva
+                                Adicionar ao carrinho
                             </button>
                         </div>
                     </div>
